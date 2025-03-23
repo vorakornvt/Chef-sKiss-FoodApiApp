@@ -25,7 +25,7 @@ const PostEdit = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto my-10 p-6 bg-white shadow-md rounded-lg">
+    <div className="max-w-4xl mx-auto my-10 p-6 shadow-md rounded-lg">
       <h2 className="text-2xl font-bold mb-4 text-center">Edit Your Recipe</h2>
       <input
         type="text"
@@ -43,7 +43,7 @@ const PostEdit = () => {
       <div className="flex justify-center">
         <button
           onClick={handleSave}
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700 transition"
+          className="inline-block **:inline-block p-2 mx-auto my-0 no-underline border-0 rounded-lg text-prime bg-brand bg-linear-45 from-brandSkew to-brand w-35 **:text-xl **:text-center hover:text-complementary hover:bg-linear-225  hover:bg-brand hover:scale-101 text-white shadow-sm hover:shadow-md text-center text-decoration-none  transition-all duration-200 ease-in-out h-10"
         >
           Save Changes
         </button>

@@ -37,8 +37,8 @@ const FavoritesPage = ({ isDarkMode }) => {
   }, []);
 
   return (
-    <div className="flex flex-col mt-20 mb-10 justify-center items-center mx-auto h-full">
-      <p className="pt-25 px-3 w-full max-w-xl text-lg font-main font-bold text-center">
+    <div className="flex flex-col mb-10 justify-center items-center mx-auto h-full">
+      <p className="pt-5 px-3 w-full max-w-xl text-lg font-main font-bold text-center">
         Your Favorite Recipes
       </p>
 

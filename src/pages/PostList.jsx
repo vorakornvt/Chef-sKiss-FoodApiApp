@@ -22,7 +22,7 @@ const PostList = () => {
 
   return (
     <div className="max-w-4xl mx-auto my-10 p-6  shadow-md rounded-lg">
-      <h2 className="text-2xl font-bold mb-4 text-center">Your Recipes</h2>
+      <p className="text-lg font-bold mb-4 text-center">Your Recipes</p>
       {posts.length > 0 ? (
         <div className="grid grid-cols-3  sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {posts.map((post, index) => (
