@@ -1,0 +1,39 @@
+{
+  "name": "reactbase",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "watch:scss": "sass --no-source-map --watch src/scss/main.scss:src/readOnlyCss",
+    "build:scss": "sass --no-source-map src/scss:src/readOnlyCss"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.0.15",
+    "bootstrap": "^5.3.3",
+    "react": "^19.0.0",
+    "react-bootstrap": "^2.10.9",
+    "react-dom": "^19.0.0",
+    "react-icons": "^5.4.0",
+    "react-router-dom": "^7.4.0",
+    "styled-components": "^6.1.16",
+    "tailwindcss": "^4.0.15"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.19.0",
+    "@types/react": "^19.0.8",
+    "@types/react-dom": "^19.0.3",
+    "@vitejs/plugin-react": "^4.3.4",
+    "daisyui": "^5.0.9",
+    "eslint": "^9.19.0",
+    "eslint-plugin-react": "^7.37.4",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-react-refresh": "^0.4.18",
+    "globals": "^15.14.0",
+    "sass": "^1.85.1",
+    "vite": "^6.1.0"
+  }
+}

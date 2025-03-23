@@ -1,0 +1,17 @@
+@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Comfortaa:wght@300..700&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+@import "tailwindcss";
+@plugin "daisyui";
+
+@theme {  
+  --font-primary: 'Comfortaa', apple-system, sans-serif;
+  --font-main: "Montserrat"
+  --color-prime: var(--color-orange-500);
+  --color-complementary: var(--color-black);
+  --color-complementarySkew: var(--color-white);
+  --color-brand: var(--color-green-700);
+  --color-brandSkew: var(--color-orange-300);
+  --color-highlight: var(--color-orange-500);
+  --color-success: var(--color-green-300);
+  --color-error: var(--color-red-600);
+}

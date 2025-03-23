@@ -1,0 +1,238 @@
+import { useEffect, useState } from "react";
+import { FaHeart } from "react-icons/fa";
+import { Link } from "react-router-dom";
+import styled from "styled-components";
+
+const StyledLink = styled(Link)`
+  color: ${(props) => (props.isDarkMode ? "#ffffff" : "#01490b")};
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.5rem 1.5rem;
+  font-size: 14px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  border-radius: 4px;
+
+  &:hover {
+    color: #ff9800;
+  }
+
+  &:active {
+    color: #ff9800;
+  }
+`;
+
+const Styledbutton = styled.button`
+  &:hover {
+    color: #ff9800;
+  }
+
+  &:active {
+    color: #ff9800;
+  }
+`;
+
+const StyledMenudiv = styled.div`
+  border: ${(props) => (props.isDarkMode ? "1px solid white " : "none")};
+`;
+
+const StyledH1 = styled.h1`
+  color: ${(props) => (props.isDarkMode ? "#f48435" : "#01490b")};
+`;
+
+const Home = ({ isDarkMode }) => {
+  const [recipes, setRecipes] = useState([]);
+  const [favorites, setFavorites] = useState([]);
+  const [query, setQuery] = useState("");
+  const [category, setCategory] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const API_URL = "https://tasty.p.rapidapi.com/recipes/list";
+  const API_OPTIONS = {
+    method: "GET",
+    headers: {
+      "X-RapidAPI-Key": "058f5dc790mshc481d5c9563dfe3p1a91cbjsne3e394091825",
+      "X-RapidAPI-Host": "tasty.p.rapidapi.com",
+    },
+  };
+
+  useEffect(() => {
+    const storedFavorites = localStorage.getItem("favorites");
+    if (storedFavorites) {
+      setFavorites(JSON.parse(storedFavorites));
+    }
+    fetchRecipes(currentPage);
+  }, [currentPage]);
+
+  const fetchRecipes = async (page) => {
+    try {
+      let url = `${API_URL}?from=${(page - 1) * 6}&size=12`;
+      if (query.trim()) {
+        url += `&q=${query}`;
+      }
+      if (category) {
+        url += `&category=${category}`;
+      }
+
+      const response = await fetch(url, API_OPTIONS);
+      const data = await response.json();
+
+      setRecipes(data.results || []);
+      setTotalPages(Math.ceil(data.count / 12)); // Update total pages for pagination
+    } catch (error) {
+      console.error("Error fetching recipes:", error);
+    }
+  };
+
+  const toggleFavorite = (recipe) => {
+    const isFavorited = favorites.some((fav) => fav.id === recipe.id);
+    let updatedFavorites;
+    if (isFavorited) {
+      updatedFavorites = favorites.filter((fav) => fav.id !== recipe.id);
+    } else {
+      updatedFavorites = [...favorites, recipe];
+    }
+    setFavorites(updatedFavorites);
+    localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
+  };
+
+  const handlePrevious = () => {
+    if (currentPage > 1) {
+      setCurrentPage((prevPage) => prevPage - 1);
+    }
+  };
+
+  const handleNext = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage((prevPage) => prevPage + 1);
+    }
+  };
+
+  return (
+    <div className="flex flex-col mt-20 mb-10 justify-center items-center mx-auto h-full">
+      <StyledH1
+        isDarkMode={isDarkMode}
+        className="pt-25 px-2 w-full max-w-xl text-4xl font-main text-center"
+      >
+        Find delicious recipes for every occasion!
+      </StyledH1>
+
+      <div className="flex items-center bg-white border-2 border-brand rounded-lg shadow-sm p-2 w-full max-w-md my-5 transition-all duration-300 hover:border-brandLight focus-within:border-brandLight">
+        <svg
+          className="h-5 w-5 text-brand opacity-50 mx-2"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeLinejoin="round"
+            strokeLinecap="round"
+            strokeWidth="2.5"
+            fill="none"
+            stroke="currentColor"
+          >
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.3-4.3"></path>
+          </g>
+        </svg>
+        <input
+          type="search"
+          className="grow p-2 text-brand outline-none w-full"
+          placeholder="Search recipes"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && fetchRecipes(currentPage)}
+        />
+      </div>
+
+      <div className="w-[80%]  text-prime bg-brand p-2 h-15 bg-linear-45 from-brandSkew to-brand  mt-15 rounded-md flex flex-wrap items-center justify-end gap-4">
+        {/* Filter by category */}
+        <select
+          className="p-2 rounded-md bg-white text-brand"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+        >
+          <option value="">All Categories</option>
+          <option value="breakfast">Breakfast</option>
+          <option value="lunch">Lunch</option>
+          <option value="dinner">Dinner</option>
+          <option value="dessert">Dessert</option>
+        </select>
+      </div>
+
+      <div className="mt-10 m-2 w-[80%] p-5 ">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-6 px-3">
+          {recipes.length > 0 ? (
+            recipes.map((recipe) => {
+              const isFavorited = favorites.some((fav) => fav.id === recipe.id);
+              return (
+                <StyledMenudiv
+                  isDarkMode={isDarkMode}
+                  key={recipe.id}
+                  className="relative h-100 shadow-lg rounded-lg overflow-hidden"
+                >
+                  <button
+                    className="absolute top-3 right-3 text-xl"
+                    onClick={() => toggleFavorite(recipe)}
+                  >
+                    <FaHeart
+                      className={`transition-all duration-300 ${
+                        isFavorited ? "text-red-500" : "text-gray-300"
+                      }`}
+                    />
+                  </button>
+
+                  <img
+                    src={
+                      recipe.thumbnail_url || "https://via.placeholder.com/300"
+                    }
+                    alt={recipe.name}
+                    className="w-full bg-cover h-40 object-cover"
+                  />
+
+                  <div className="">
+                    <div className="p-3">
+                      <p className="text-md font-semibold">{recipe.name}</p>
+                      <p className="text-[13px] h-20 ">
+                        {recipe.description
+                          ? recipe.description.slice(0, 80) + "..."
+                          : "No description available."}
+                      </p>
+                    </div>
+                    <StyledLink
+                      isDarkMode={isDarkMode}
+                      to={`/recipe/${recipe.id}`}
+                      className="hover:underline mx-auto"
+                    >
+                      View Recipe
+                    </StyledLink>
+                  </div>
+                </StyledMenudiv>
+              );
+            })
+          ) : (
+            <span className="loading loading-dots text-prime"></span>
+          )}
+        </div>
+
+        <div className="join grid w-100 mt-10 mx-auto grid-cols-2">
+          <Styledbutton
+            className="join-item btn btn-outline "
+            onClick={handlePrevious}
+            disabled={currentPage === 1}
+          >
+            Previous page
+          </Styledbutton>
+          <Styledbutton
+            className="join-item btn btn-outline "
+            onClick={handleNext}
+            disabled={currentPage * 6 >= recipes.length}
+          >
+            Next page
+          </Styledbutton>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Home;
