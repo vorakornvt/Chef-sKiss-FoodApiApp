@@ -8,6 +8,10 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import FavoritesPage from "./pages/FavoritesPage";
 import RecipeDetail from "./pages/RecipeDetail";
+import NotFound from "./pages/NotFound";
+import PostList from "./pages/PostList";
+import PostCreate from "./pages/PostCreate";
+import PostEdit from "./pages/PostEdit";
 
 const GlobalStyle = createGlobalStyle`
   body {
@@ -47,6 +51,11 @@ function App() {
             element={<FavoritesPage isDarkMode={isDarkMode} />}
           />
           <Route path="recipe/:id" element={<RecipeDetail />} />
+          <Route path="/*" element={<NotFound />} />
+          <Route path="/posts" element={<PostList />} />
+          <Route path="/edit/:index" element={<PostEdit />} />
+
+          <Route path="/createpost" element={<PostCreate />} />
         </Routes>
       </Layout>
       <Footer isDarkMode={isDarkMode}></Footer>

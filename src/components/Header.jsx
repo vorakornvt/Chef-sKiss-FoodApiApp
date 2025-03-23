@@ -7,7 +7,7 @@ const StyledLink = styled(Link)`
   text-decoration: none;
   font-weight: 500;
   padding: 0.5rem 1.5rem;
-  font-size: 14px;
+  font-size: 12px;
   transition: background-color 0.3s ease, color 0.3s ease;
   border-radius: 4px;
 
@@ -63,8 +63,13 @@ const Header = ({ toggleTheme, isDarkMode }) => {
           </StyledLink>
         </li>
         <li>
-          <StyledLink isDarkMode={isDarkMode} to="/about">
+          <StyledLink isDarkMode={isDarkMode} to="/posts">
             READ
+          </StyledLink>
+        </li>
+        <li>
+          <StyledLink isDarkMode={isDarkMode} to="/createpost">
+            SHARE
           </StyledLink>
         </li>
       </ul>
