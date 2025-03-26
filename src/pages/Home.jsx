@@ -43,25 +43,37 @@ const Home = ({ isDarkMode }) => {
   const [recipes, setRecipes] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const [query, setQuery] = useState("");
-  const [category, setCategory] = useState("");
+
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  const API_URL = "https://tasty.p.rapidapi.com/recipes/list";
-  const API_OPTIONS = {
-    method: "GET",
-    headers: {
-      "X-RapidAPI-Key": "058f5dc790mshc481d5c9563dfe3p1a91cbjsne3e394091825",
-      "X-RapidAPI-Host": "tasty.p.rapidapi.com",
-    },
-  };
+  const [numServings, setNumServings] = useState("");
+  const [originalRecipes, setOriginalRecipes] = useState([]);
+
+  // const API_URL = "https://tasty.p.rapidapi.com/recipes/list";
+  // const API_OPTIONS = {
+  //   method: "GET",
+  //   headers: {
+  //     "X-RapidAPI-Key": "YOUR_RAPIDAPI_KEY",
+  //     "X-RapidAPI-Host": "tasty.p.rapidapi.com",
+  //   },
+  // };
 
   useEffect(() => {
     const storedFavorites = localStorage.getItem("favorites");
     if (storedFavorites) {
       setFavorites(JSON.parse(storedFavorites));
     }
-    fetchRecipes(currentPage);
+
+    // Check if recipes already exist in localStorage
+    const storedRecipes = localStorage.getItem("recipes_page_1");
+    if (storedRecipes) {
+      setRecipes(JSON.parse(storedRecipes));
+      setOriginalRecipes(JSON.parse(storedRecipes)); // Save the original recipes
+      setTotalPages(Math.ceil(JSON.parse(storedRecipes).length / 12)); // You can adjust this if your pagination logic changes
+    } else {
+      fetchRecipes(currentPage); // Fetch from API if no localStorage data
+    }
   }, [currentPage]);
 
   const fetchRecipes = async (page) => {
@@ -70,19 +82,53 @@ const Home = ({ isDarkMode }) => {
       if (query.trim()) {
         url += `&q=${query}`;
       }
-      if (category) {
-        url += `&category=${category}`;
-      }
 
       const response = await fetch(url, API_OPTIONS);
       const data = await response.json();
 
       setRecipes(data.results || []);
-      setTotalPages(Math.ceil(data.count / 12)); // Update total pages for pagination
+      setOriginalRecipes(data.results || []); // Save the original recipes
+      setTotalPages(Math.ceil(data.count / 12));
+
+      // Store recipes in localStorage
+      localStorage.setItem("recipes", JSON.stringify(data.results || []));
     } catch (error) {
       console.error("Error fetching recipes:", error);
     }
   };
+
+  const servingsMap = {
+    "Servings: 1": "1",
+    "Servings: 4": "4",
+    "Servings: 6 | 6-8 Servings": "6",
+    "Servings: 8 | 8 Servings | Makes 8-10 cookies": "8",
+    "10 Servings | Servings: 6-10": "10",
+    "12 Servings": "12",
+    "Makes 14-16 tacos": "14",
+    "Servings: 20": "20",
+    "Servings: 24": "24",
+  };
+
+  useEffect(() => {
+    let filtered = [...originalRecipes]; // Always start with the original list
+
+    if (query.trim()) {
+      filtered = filtered.filter((recipe) =>
+        recipe.name.toLowerCase().includes(query.toLowerCase())
+      );
+    }
+
+    if (numServings && numServings !== "*") {
+      // Handle "ALL" option
+      const normalizedServing = servingsMap[numServings];
+      filtered = filtered.filter((recipe) => {
+        const recipeServing = servingsMap[recipe.yields] || recipe.yields;
+        return recipeServing === normalizedServing;
+      });
+    }
+
+    setRecipes(filtered);
+  }, [query, numServings, originalRecipes]);
 
   const toggleFavorite = (recipe) => {
     const isFavorited = favorites.some((fav) => fav.id === recipe.id);
@@ -109,126 +155,137 @@ const Home = ({ isDarkMode }) => {
   };
 
   return (
-    <div className="flex flex-col mt-20 mb-10 justify-center items-center mx-auto h-full">
-      <StyledH1
-        isDarkMode={isDarkMode}
-        className="pt-25 px-2 w-full max-w-xl text-4xl font-main text-center"
-      >
-        Find delicious recipes for every occasion!
-      </StyledH1>
-
-      <div className="flex items-center bg-white border-2 border-brand rounded-lg shadow-sm p-2 w-full max-w-md my-5 transition-all duration-300 hover:border-brandLight focus-within:border-brandLight">
-        <svg
-          className="h-5 w-5 text-brand opacity-50 mx-2"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
+    <div className="relative">
+      {/* Main Content Wrapper */}
+      <div className="relative z-10 flex flex-col mt-20 mb-10 justify-center items-center mx-auto h-full">
+        <StyledH1
+          isDarkMode={isDarkMode}
+          className="pt-25 px-2 w-full max-w-xl text-4xl font-main text-center"
         >
-          <g
-            strokeLinejoin="round"
-            strokeLinecap="round"
-            strokeWidth="2.5"
-            fill="none"
-            stroke="currentColor"
+          Find delicious recipes for every occasion!
+        </StyledH1>
+
+        <div className="flex items-center bg-white border-2 border-brand rounded-lg shadow-sm p-2 w-full max-w-md my-5 transition-all duration-300 hover:border-brandLight focus-within:border-brandLight">
+          <svg
+            className="h-5 w-5 text-brand opacity-50 mx-2"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
           >
-            <circle cx="11" cy="11" r="8"></circle>
-            <path d="m21 21-4.3-4.3"></path>
-          </g>
-        </svg>
-        <input
-          type="search"
-          className="grow p-2 text-brand outline-none w-full"
-          placeholder="Search recipes"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && fetchRecipes(currentPage)}
-        />
-      </div>
-
-      <div className="w-[80%]  text-prime bg-brand p-2 h-15 bg-linear-45 from-brandSkew to-brand  mt-15 rounded-md flex flex-wrap items-center justify-end gap-4">
-        {/* Filter by category */}
-        <select
-          className="p-2 rounded-md bg-white text-brand"
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-        >
-          <option value="">All Categories</option>
-          <option value="breakfast">Breakfast</option>
-          <option value="lunch">Lunch</option>
-          <option value="dinner">Dinner</option>
-          <option value="dessert">Dessert</option>
-        </select>
-      </div>
-
-      <div className="mt-10 m-2 w-[80%] p-5 ">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-6 px-3">
-          {recipes.length > 0 ? (
-            recipes.map((recipe) => {
-              const isFavorited = favorites.some((fav) => fav.id === recipe.id);
-              return (
-                <StyledMenudiv
-                  isDarkMode={isDarkMode}
-                  key={recipe.id}
-                  className="relative h-100 shadow-lg rounded-lg overflow-hidden"
-                >
-                  <button
-                    className="absolute top-3 right-3 text-xl"
-                    onClick={() => toggleFavorite(recipe)}
-                  >
-                    <FaHeart
-                      className={`transition-all duration-300 ${
-                        isFavorited ? "text-red-500" : "text-gray-300"
-                      }`}
-                    />
-                  </button>
-
-                  <img
-                    src={
-                      recipe.thumbnail_url || "https://via.placeholder.com/300"
-                    }
-                    alt={recipe.name}
-                    className="w-full bg-cover h-40 object-cover"
-                  />
-
-                  <div className="">
-                    <div className="p-3">
-                      <p className="text-md font-semibold">{recipe.name}</p>
-                      <p className="text-[13px] h-20 ">
-                        {recipe.description
-                          ? recipe.description.slice(0, 80) + "..."
-                          : "No description available."}
-                      </p>
-                    </div>
-                    <StyledLink
-                      isDarkMode={isDarkMode}
-                      to={`/recipe/${recipe.id}`}
-                      className="hover:underline mx-auto"
-                    >
-                      View Recipe
-                    </StyledLink>
-                  </div>
-                </StyledMenudiv>
-              );
-            })
-          ) : (
-            <span className="loading loading-dots text-prime"></span>
-          )}
+            <g
+              strokeLinejoin="round"
+              strokeLinecap="round"
+              strokeWidth="2.5"
+              fill="none"
+              stroke="currentColor"
+            >
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.3-4.3"></path>
+            </g>
+          </svg>
+          <input
+            type="search"
+            className="grow p-2 text-brand outline-none w-full"
+            placeholder="Search recipes"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && fetchRecipes(currentPage)}
+          />
         </div>
 
-        <div className="join grid w-100 mt-10 mx-auto grid-cols-2">
-          <Styledbutton
-            className="join-item btn btn-outline "
-            onClick={handlePrevious}
-            disabled={currentPage === 1}
+        <div className="w-[80%] text-prime bg-brand p-2 h-15 bg-linear-45 from-brandSkew to-brand mt-15 rounded-md flex flex-wrap items-center justify-end gap-4">
+          {/* Number of Servings Dropdown */}
+          <select
+            className="p-2 rounded-md bg-white text-brand"
+            value={numServings}
+            onChange={(e) => setNumServings(e.target.value)}
           >
-            Previous page
-          </Styledbutton>
-          <Styledbutton
-            className="join-item btn btn-outline "
-            onClick={handleNext}
-            disabled={currentPage * 6 >= recipes.length}
-          >
-            Next page
-          </Styledbutton>
+            <option value="">Select Min Servings</option>
+            <option value="*">ALL</option>
+            <option value="Servings: 1">1 serve</option>
+            <option value="Servings: 4">4 serves</option>
+
+            <option value="12 Servings">12 serves</option>
+            <option value="Makes 14-16 tacos">14 serves</option>
+            <option value="Servings: 20">20 serves</option>
+            <option value="Servings: 24">24 serves</option>
+          </select>
+        </div>
+
+        <div className="mt-10 m-2 w-[80%] p-5 ">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-6 px-3">
+            {recipes.length > 0 ? (
+              recipes.map((recipe) => {
+                const isFavorited = favorites.some(
+                  (fav) => fav.id === recipe.id
+                );
+                return (
+                  <StyledMenudiv
+                    isDarkMode={isDarkMode}
+                    key={recipe.id}
+                    className="relative h-102 shadow-lg rounded-lg overflow-hidden"
+                  >
+                    <button
+                      className="absolute top-3 right-3 text-xl"
+                      onClick={() => toggleFavorite(recipe)}
+                    >
+                      <FaHeart
+                        className={`transition-all duration-300 ${
+                          isFavorited ? "text-red-500" : "text-gray-300"
+                        }`}
+                      />
+                    </button>
+
+                    <img
+                      src={
+                        recipe.thumbnail_url ||
+                        "https://via.placeholder.com/300"
+                      }
+                      alt={recipe.name}
+                      className="w-full bg-cover h-40 object-cover"
+                    />
+
+                    <div className="">
+                      <div className="p-3">
+                        <p className="text-md font-semibold">{recipe.name}</p>
+                        <p className="text-sm font-semibold">{recipe.yields}</p>
+                        <p className="text-[13px] h-10 ">
+                          {recipe.description
+                            ? recipe.description.slice(0, 70) + "..."
+                            : "No description available."}
+                        </p>
+                      </div>
+                      <StyledLink
+                        isDarkMode={isDarkMode}
+                        to={`/recipe/${recipe.id}`}
+                        className="hover:underline mx-auto"
+                      >
+                        View Recipe
+                      </StyledLink>
+                    </div>
+                  </StyledMenudiv>
+                );
+              })
+            ) : (
+              <span className="loading loading-dots text-prime"></span>
+            )}
+          </div>
+
+          <div className="join grid w-100 mt-10 mx-auto grid-cols-2">
+            <Styledbutton
+              className="join-item btn btn-outline "
+              onClick={handlePrevious}
+              disabled={currentPage === 1}
+            >
+              Previous page
+            </Styledbutton>
+            <Styledbutton
+              className="join-item btn btn-outline "
+              onClick={handleNext}
+              disabled={currentPage * 6 >= recipes.length}
+            >
+              Next page
+            </Styledbutton>
+          </div>
         </div>
       </div>
     </div>

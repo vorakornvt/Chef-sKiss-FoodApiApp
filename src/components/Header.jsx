@@ -26,7 +26,7 @@ const Styledsvg = styled.svg`
 
 const Header = ({ toggleTheme, isDarkMode }) => {
   return (
-    <div className="navbar px-6 py-3 flex items-center justify-between relative">
+    <div className="navbar z-1 px-6 py-3 flex items-center justify-between relative">
       {/* Logo */}
       <div className="absolute left-1/2 transform -translate-x-1/2">
         <Link to="/">

@@ -6,13 +6,13 @@ const PostList = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedPosts = JSON.parse(localStorage.getItem("recipes")) || [];
+    const storedPosts = JSON.parse(localStorage.getItem("recipesPost")) || [];
     setPosts(storedPosts);
   }, []);
 
   const handleDelete = (index) => {
     const updatedPosts = posts.filter((_, i) => i !== index);
-    localStorage.setItem("recipes", JSON.stringify(updatedPosts));
+    localStorage.setItem("recipesPost", JSON.stringify(updatedPosts));
     setPosts(updatedPosts);
   };
 
@@ -21,17 +21,35 @@ const PostList = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto my-10 p-6  shadow-md rounded-lg">
+    <div className="max-w-4xl mx-auto my-10 p-6 shadow-md rounded-lg">
       <p className="text-lg font-bold mb-4 text-center">Your Recipes</p>
       {posts.length > 0 ? (
-        <div className="grid grid-cols-3  sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-3 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {posts.map((post, index) => (
             <div
               key={index}
-              className=" p-4 border-white border-1 h-100  rounded-lg shadow-md"
+              className="p-4 border-white border-1 h-100 z-1 rounded-lg shadow-md"
             >
               <h3 className="text-xl font-semibold mb-2">{post.title}</h3>
-              <p className="text-gray-700 mb-4">{post.content}</p>
+
+              {/* Display the image from the URL */}
+              {post.url && (
+                <img
+                  src={post.url}
+                  alt={post.title}
+                  className="w-full h-48 object-cover mb-4 rounded-lg"
+                />
+              )}
+
+              <p className="mb-4">{post.content}</p>
+
+              {/* Display the number of servings */}
+              {post.servings && (
+                <p className="text-sm text-gray-600">
+                  Servings: {post.servings}
+                </p>
+              )}
+
               <div className="flex justify-between items-center">
                 <div className="flex gap-[40px] space-x-4">
                   <button
@@ -52,7 +70,7 @@ const PostList = () => {
           ))}
         </div>
       ) : (
-        <p className="text-center text-gray-500">No recipes yet.</p>
+        <p className="text-center ">No recipes yet.</p>
       )}
     </div>
   );

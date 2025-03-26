@@ -49,7 +49,7 @@ const FavoritesPage = ({ isDarkMode }) => {
               <StyledMenudiv
                 isDarkMode={isDarkMode}
                 key={recipe.id}
-                className="relative shadow-lg rounded-lg overflow-hidden"
+                className="relative h-105 shadow-lg rounded-lg overflow-hidden"
               >
                 <button className="absolute top-3 right-3 text-xl">
                   <FaHeart className="text-red-500 " />
