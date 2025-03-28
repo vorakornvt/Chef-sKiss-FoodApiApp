@@ -59,6 +59,8 @@ const Home = ({ isDarkMode }) => {
   //   },
   // };
 
+  //My API account reached its limit request number per mouth, so i order to test this we need to sign up for new Key,
+
   useEffect(() => {
     const storedFavorites = localStorage.getItem("favorites");
     if (storedFavorites) {
@@ -66,7 +68,7 @@ const Home = ({ isDarkMode }) => {
     }
 
     // Check if recipes already exist in localStorage
-    const storedRecipes = localStorage.getItem("recipes_page_1");
+    const storedRecipes = localStorage.getItem("recipes_page");
     if (storedRecipes) {
       setRecipes(JSON.parse(storedRecipes));
       setOriginalRecipes(JSON.parse(storedRecipes)); // Save the original recipes
@@ -87,11 +89,11 @@ const Home = ({ isDarkMode }) => {
       const data = await response.json();
 
       setRecipes(data.results || []);
-      setOriginalRecipes(data.results || []); // Save the original recipes
+      setOriginalRecipes(data.results || []);
       setTotalPages(Math.ceil(data.count / 12));
 
       // Store recipes in localStorage
-      localStorage.setItem("recipes", JSON.stringify(data.results || []));
+      localStorage.setItem("recipes_page", JSON.stringify(data.results || []));
     } catch (error) {
       console.error("Error fetching recipes:", error);
     }

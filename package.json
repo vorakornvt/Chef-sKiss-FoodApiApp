@@ -9,19 +9,26 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "watch:scss": "sass --no-source-map --watch src/scss/main.scss:src/readOnlyCss",
-    "build:scss": "sass --no-source-map src/scss:src/readOnlyCss"
+    "build:scss": "sass --no-source-map src/scss:src/readOnlyCss",
+    "vitest": "vitest--coverage"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.0.15",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.2.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@vitest/coverage-v8": "^3.0.9",
     "bootstrap": "^5.3.3",
     "joi": "^17.13.3",
+    "jsdom": "^26.0.0",
     "react": "^19.0.0",
     "react-bootstrap": "^2.10.9",
     "react-dom": "^19.0.0",
     "react-icons": "^5.4.0",
     "react-router-dom": "^7.4.0",
     "styled-components": "^6.1.16",
-    "tailwindcss": "^4.0.15"
+    "tailwindcss": "^4.0.15",
+    "vitest": "^3.0.9"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
