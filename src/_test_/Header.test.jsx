@@ -1,4 +1,4 @@
-import { describe, expect, it, test } from "vitest";
+import { expect, test } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { ThemeProvider } from "styled-components";
 import { BrowserRouter as Router } from "react-router-dom";
@@ -9,11 +9,6 @@ import Header from "../components/Header";
 const lightTheme = {
   body: "#fff7ed",
   text: "#000",
-};
-
-const darkTheme = {
-  body: "#000000",
-  text: "#fff",
 };
 
 // Wrap the component with the ThemeProvider

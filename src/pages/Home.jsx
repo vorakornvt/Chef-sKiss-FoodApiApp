@@ -231,6 +231,7 @@ const Home = ({ isDarkMode }) => {
                       onClick={() => toggleFavorite(recipe)}
                     >
                       <FaHeart
+                        data-testid="fav"
                         className={`transition-all duration-300 ${
                           isFavorited ? "text-red-500" : "text-gray-300"
                         }`}
