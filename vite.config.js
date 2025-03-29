@@ -8,18 +8,10 @@ export default defineConfig({
   server: {
     port: 3000,
   },
-  // REMOVE SCSS-BOOTSTRAP WARNINGS (should hopefully be fixed by BS v5.4)
-  css: {
-    preprocessorOptions: {
-      scss: {
-        api: "modern-compiler", // or "modern"
-        silenceDeprecations: [
-          "mixed-decls",
-          "color-functions",
-          "global-builtin",
-          "import",
-        ],
-      },
-    },
+  test: {
+    globals: true,
+    environment: "jsdom",
+    setupFiles: "./src/test/setup.js",
+    css: true,
   },
 });

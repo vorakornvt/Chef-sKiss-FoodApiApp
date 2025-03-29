@@ -32,6 +32,7 @@ const Header = ({ toggleTheme, isDarkMode }) => {
         <Link to="/">
           <Styledsvg
             isDarkMode={isDarkMode}
+            data-testid="LOGO"
             viewBox="0 0 119.17 104.84"
             width="80px"
             height="auto"

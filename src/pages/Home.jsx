@@ -71,16 +71,16 @@ const Home = ({ isDarkMode }) => {
     const storedRecipes = localStorage.getItem("recipes_page");
     if (storedRecipes) {
       setRecipes(JSON.parse(storedRecipes));
-      setOriginalRecipes(JSON.parse(storedRecipes)); // Save the original recipes
-      setTotalPages(Math.ceil(JSON.parse(storedRecipes).length / 12)); // You can adjust this if your pagination logic changes
+      setOriginalRecipes(JSON.parse(storedRecipes));
+      setTotalPages(Math.ceil(JSON.parse(storedRecipes).length / 12));
     } else {
-      fetchRecipes(currentPage); // Fetch from API if no localStorage data
+      fetchRecipes(currentPage);
     }
   }, [currentPage]);
 
   const fetchRecipes = async (page) => {
     try {
-      let url = `${API_URL}?from=${(page - 1) * 6}&size=12`;
+      let url = `${API_URL}?from=${(page - 1) * 6}&size=6`;
       if (query.trim()) {
         url += `&q=${query}`;
       }
@@ -112,7 +112,7 @@ const Home = ({ isDarkMode }) => {
   };
 
   useEffect(() => {
-    let filtered = [...originalRecipes]; // Always start with the original list
+    let filtered = [...originalRecipes];
 
     if (query.trim()) {
       filtered = filtered.filter((recipe) =>
