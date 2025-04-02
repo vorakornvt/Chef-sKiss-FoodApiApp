@@ -7,7 +7,7 @@ const StyledLink = styled(Link)`
   text-decoration: none;
   font-weight: 500;
   padding: 0.5rem 1.5rem;
-  font-size: 12px;
+  font-size: 13px;
   transition: background-color 0.3s ease, color 0.3s ease;
   border-radius: 4px;
 
@@ -26,7 +26,7 @@ const Styledsvg = styled.svg`
 
 const Header = ({ toggleTheme, isDarkMode }) => {
   return (
-    <div className="navbar z-1 px-6 py-3 flex items-center justify-between relative">
+    <div className="navbar z-1 px-6 py-3 pt-4 flex items-center justify-between relative">
       {/* Logo */}
       <div className="absolute left-1/2 transform -translate-x-1/2">
         <Link to="/">

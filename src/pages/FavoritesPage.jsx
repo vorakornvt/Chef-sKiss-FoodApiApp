@@ -87,9 +87,7 @@ const FavoritesPage = ({ isDarkMode }) => {
                 </button>
 
                 <img
-                  src={
-                    recipe.thumbnail_url || "https://via.placeholder.com/300"
-                  } // Fallback image if thumbnail is missing
+                  src={recipe.thumbnail_url}
                   alt={recipe.name}
                   className="w-full bg-cover h-40 object-cover"
                 />

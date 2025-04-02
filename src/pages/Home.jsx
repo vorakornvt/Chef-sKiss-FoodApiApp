@@ -2,6 +2,15 @@ import { useEffect, useState } from "react";
 import { FaHeart } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import Joi from "joi";
+
+const searchSchema = Joi.object({
+  query: Joi.string().trim().min(2).max(50).messages({
+    "string.empty": "Search query cannot be empty.",
+    "string.min": "Search query must be at least 2 characters long.",
+    "string.max": "Search query cannot exceed 50 characters.",
+  }),
+});
 
 const StyledLink = styled(Link)`
   color: ${(props) => (props.isDarkMode ? "#ffffff" : "#01490b")};
@@ -37,6 +46,7 @@ const Home = ({ isDarkMode }) => {
   const [numServings, setNumServings] = useState("");
   const [originalRecipes, setOriginalRecipes] = useState([]);
   const [isLoading, setIsLoading] = useState(false); // Loading state
+  const [error, setError] = useState("");
 
   const API_URL = "https://tasty.p.rapidapi.com/recipes/list";
   const API_OPTIONS = {
@@ -86,10 +96,17 @@ const Home = ({ isDarkMode }) => {
     }
   };
 
-  // Ensure fetch happens when searching
   const handleSearch = () => {
+    const { error } = searchSchema.validate({ query });
+
+    if (error) {
+      setError(error.details[0].message);
+      return;
+    }
+
+    setError(""); // Clear any previous errors
     setCurrentPage(1); // Reset to first page
-    fetchRecipes(1);
+    fetchRecipes(1); // Fetch with validated query
   };
 
   const servingsMap = {
@@ -164,14 +181,18 @@ const Home = ({ isDarkMode }) => {
               <path d="m21 21-4.3-4.3"></path>
             </g>
           </svg>
-          <input
-            type="search"
-            className="grow p-2 text-brand outline-none w-full"
-            placeholder="Search recipes"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-          />
+
+          <div>
+            <input
+              type="search"
+              className="grow p-2 text-brand outline-none w-full"
+              placeholder="your main ingredient"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            />
+            {error && <p className="text-red-500 text-sm">{error}</p>}
+          </div>
         </div>
 
         <div className="w-[80%] text-prime bg-brand p-2 h-15 bg-linear-45 from-brandSkew to-brand mt-15 rounded-md flex flex-wrap items-center justify-end gap-4">
@@ -255,7 +276,7 @@ const Home = ({ isDarkMode }) => {
                 No Recipes Found
               </p>
             ) : (
-              <span className="loading loading-dots text-prime"></span> // Show loading spinner if no recipes
+              <span className="loading loading-dots text-prime"></span>
             )}
           </div>
         </div>
