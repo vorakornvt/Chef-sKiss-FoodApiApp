@@ -21,16 +21,6 @@ const StyledLink = styled(Link)`
   }
 `;
 
-const Styledbutton = styled.button`
-  &:hover {
-    color: #ff9800;
-  }
-
-  &:active {
-    color: #ff9800;
-  }
-`;
-
 const StyledMenudiv = styled.div`
   border: ${(props) => (props.isDarkMode ? "1px solid white " : "none")};
 `;
@@ -43,23 +33,21 @@ const Home = ({ isDarkMode }) => {
   const [recipes, setRecipes] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const [query, setQuery] = useState("");
-
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-
   const [numServings, setNumServings] = useState("");
   const [originalRecipes, setOriginalRecipes] = useState([]);
+  const [isLoading, setIsLoading] = useState(false); // Loading state
 
-  // const API_URL = "https://tasty.p.rapidapi.com/recipes/list";
-  // const API_OPTIONS = {
-  //   method: "GET",
-  //   headers: {
-  //     "X-RapidAPI-Key": "YOUR_RAPIDAPI_KEY",
-  //     "X-RapidAPI-Host": "tasty.p.rapidapi.com",
-  //   },
-  // };
+  const API_URL = "https://tasty.p.rapidapi.com/recipes/list";
+  const API_OPTIONS = {
+    method: "GET",
+    headers: {
+      "X-RapidAPI-Key": "058f5dc790mshc481d5c9563dfe3p1a91cbjsne3e394091825",
+      "X-RapidAPI-Host": "tasty.p.rapidapi.com",
+    },
+  };
 
-  //My API account reached its limit request number per mouth, so i order to test this we need to sign up for new Key,
+  // My API account may have reached its limit request number per mouth, so i order to test this we need to sign up for new Key, something wrong with api
 
   useEffect(() => {
     const storedFavorites = localStorage.getItem("favorites");
@@ -68,19 +56,20 @@ const Home = ({ isDarkMode }) => {
     }
 
     // Check if recipes already exist in localStorage
-    const storedRecipes = localStorage.getItem("recipes_page");
+    const storedRecipes = localStorage.getItem("recipes_page"); //it should get fetched data to display change to  "recipes_page" whem api back to normal or not limited anymore
     if (storedRecipes) {
       setRecipes(JSON.parse(storedRecipes));
       setOriginalRecipes(JSON.parse(storedRecipes));
-      setTotalPages(Math.ceil(JSON.parse(storedRecipes).length / 12));
     } else {
       fetchRecipes(currentPage);
     }
   }, [currentPage]);
 
-  const fetchRecipes = async (page) => {
+  const fetchRecipes = async () => {
+    setIsLoading(true);
     try {
-      let url = `${API_URL}?from=${(page - 1) * 6}&size=6`;
+      let url = `${API_URL}?from=${(currentPage - 1) * 12}&size=12`;
+
       if (query.trim()) {
         url += `&q=${query}`;
       }
@@ -89,14 +78,18 @@ const Home = ({ isDarkMode }) => {
       const data = await response.json();
 
       setRecipes(data.results || []);
-      setOriginalRecipes(data.results || []);
-      setTotalPages(Math.ceil(data.count / 12));
-
-      // Store recipes in localStorage
       localStorage.setItem("recipes_page", JSON.stringify(data.results || []));
     } catch (error) {
       console.error("Error fetching recipes:", error);
+    } finally {
+      setIsLoading(false); // Set loading state to false once data is fetched
     }
+  };
+
+  // Ensure fetch happens when searching
+  const handleSearch = () => {
+    setCurrentPage(1); // Reset to first page
+    fetchRecipes(1);
   };
 
   const servingsMap = {
@@ -121,7 +114,6 @@ const Home = ({ isDarkMode }) => {
     }
 
     if (numServings && numServings !== "*") {
-      // Handle "ALL" option
       const normalizedServing = servingsMap[numServings];
       filtered = filtered.filter((recipe) => {
         const recipeServing = servingsMap[recipe.yields] || recipe.yields;
@@ -129,8 +121,8 @@ const Home = ({ isDarkMode }) => {
       });
     }
 
-    setRecipes(filtered);
-  }, [query, numServings, originalRecipes]);
+    setRecipes(filtered.slice((currentPage - 1) * 12, currentPage * 12));
+  }, [query, numServings, originalRecipes, currentPage]);
 
   const toggleFavorite = (recipe) => {
     const isFavorited = favorites.some((fav) => fav.id === recipe.id);
@@ -142,18 +134,6 @@ const Home = ({ isDarkMode }) => {
     }
     setFavorites(updatedFavorites);
     localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
-  };
-
-  const handlePrevious = () => {
-    if (currentPage > 1) {
-      setCurrentPage((prevPage) => prevPage - 1);
-    }
-  };
-
-  const handleNext = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage((prevPage) => prevPage + 1);
-    }
   };
 
   return (
@@ -190,7 +170,7 @@ const Home = ({ isDarkMode }) => {
             placeholder="Search recipes"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && fetchRecipes(currentPage)}
+            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
           />
         </div>
 
@@ -215,7 +195,9 @@ const Home = ({ isDarkMode }) => {
 
         <div className="mt-10 m-2 w-[80%] p-5 ">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-6 px-3">
-            {recipes.length > 0 ? (
+            {isLoading ? (
+              <span className="loading loading-dots text-prime"></span> // Show loading spinner
+            ) : recipes.length > 0 ? (
               recipes.map((recipe) => {
                 const isFavorited = favorites.some(
                   (fav) => fav.id === recipe.id
@@ -260,7 +242,7 @@ const Home = ({ isDarkMode }) => {
                       <StyledLink
                         isDarkMode={isDarkMode}
                         to={`/recipe/${recipe.id}`}
-                        className="hover:underline mx-auto"
+                        className="hover:underline mx-auto border-1 ms-2"
                       >
                         View Recipe
                       </StyledLink>
@@ -268,26 +250,13 @@ const Home = ({ isDarkMode }) => {
                   </StyledMenudiv>
                 );
               })
+            ) : query || numServings ? (
+              <p className="text-center text-lg text-gray-600 mt-5">
+                No Recipes Found
+              </p>
             ) : (
-              <span className="loading loading-dots text-prime"></span>
+              <span className="loading loading-dots text-prime"></span> // Show loading spinner if no recipes
             )}
-          </div>
-
-          <div className="join grid w-100 mt-10 mx-auto grid-cols-2">
-            <Styledbutton
-              className="join-item btn btn-outline "
-              onClick={handlePrevious}
-              disabled={currentPage === 1}
-            >
-              Previous page
-            </Styledbutton>
-            <Styledbutton
-              className="join-item btn btn-outline "
-              onClick={handleNext}
-              disabled={currentPage * 6 >= recipes.length}
-            >
-              Next page
-            </Styledbutton>
           </div>
         </div>
       </div>
