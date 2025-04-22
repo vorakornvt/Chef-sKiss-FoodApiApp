@@ -52,7 +52,7 @@ const Home = ({ isDarkMode }) => {
   const API_OPTIONS = {
     method: "GET",
     headers: {
-      "X-RapidAPI-Key": "058f5dc790mshc481d5c9563dfe3p1a91cbjsne3e394091825",
+      "X-RapidAPI-Key": import.meta.env.VITE_TASTY_API_KEY,
       "X-RapidAPI-Host": "tasty.p.rapidapi.com",
     },
   };
