@@ -14,7 +14,7 @@ const StyledLink = styled(Link)`
   color: ${(props) =>
     props.isDarkMode
       ? "#ffffff"
-      : "#01490b"}; // Dynamic color based on dark mode
+      : "#01490b"}; 
   text-decoration: none;
   font-weight: 500;
   padding: 0.5rem 1.5rem;
