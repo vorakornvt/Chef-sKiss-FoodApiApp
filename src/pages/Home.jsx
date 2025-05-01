@@ -3,6 +3,7 @@ import { FaHeart } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import Joi from "joi";
+import mockRecipeData from "../mock/mockRecipe";
 
 const searchSchema = Joi.object({
   query: Joi.string().trim().min(2).max(50).messages({
@@ -48,17 +49,6 @@ const Home = ({ isDarkMode }) => {
   const [isLoading, setIsLoading] = useState(false); // Loading state
   const [error, setError] = useState("");
 
-  const API_URL = "https://tasty.p.rapidapi.com/recipes/list";
-  const API_OPTIONS = {
-    method: "GET",
-    headers: {
-      "X-RapidAPI-Key": import.meta.env.VITE_TASTY_API_KEY,
-      "X-RapidAPI-Host": "tasty.p.rapidapi.com",
-    },
-  };
-
-  // My API account may have reached its limit request number per mouth, so i order to test this we need to sign up for new Key, something wrong with api
-
   useEffect(() => {
     const storedFavorites = localStorage.getItem("favorites");
     if (storedFavorites) {
@@ -66,7 +56,8 @@ const Home = ({ isDarkMode }) => {
     }
 
     // Check if recipes already exist in localStorage
-    const storedRecipes = localStorage.getItem("recipes_page"); //it should get fetched data to display change to  "recipes_page" whem api back to normal or not limited anymore
+    const storedRecipes = localStorage.getItem("recipes_page");
+
     if (storedRecipes) {
       setRecipes(JSON.parse(storedRecipes));
       setOriginalRecipes(JSON.parse(storedRecipes));
@@ -78,21 +69,22 @@ const Home = ({ isDarkMode }) => {
   const fetchRecipes = async () => {
     setIsLoading(true);
     try {
-      let url = `${API_URL}?from=${(currentPage - 1) * 12}&size=12`;
+      // Simulate network delay (optional)
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
-      if (query.trim()) {
-        url += `&q=${query}`;
-      }
+      const filteredData = query.trim()
+        ? mockRecipeData.filter((recipe) =>
+            recipe.name.toLowerCase().includes(query.toLowerCase())
+          )
+        : mockRecipeData;
 
-      const response = await fetch(url, API_OPTIONS);
-      const data = await response.json();
-
-      setRecipes(data.results || []);
-      localStorage.setItem("recipes_page", JSON.stringify(data.results || []));
+      localStorage.setItem("recipes_page", JSON.stringify(filteredData));
+      setRecipes(filteredData.slice((currentPage - 1) * 12, currentPage * 12));
+      setOriginalRecipes(filteredData);
     } catch (error) {
-      console.error("Error fetching recipes:", error);
+      console.error("Error loading mock data:", error);
     } finally {
-      setIsLoading(false); // Set loading state to false once data is fetched
+      setIsLoading(false);
     }
   };
 
