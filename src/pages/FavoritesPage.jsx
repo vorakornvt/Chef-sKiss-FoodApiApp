@@ -11,10 +11,7 @@ import styled from "styled-components";
  * @param {boolean} isDarkMode - A prop that determines if dark mode is enabled.
  */
 const StyledLink = styled(Link)`
-  color: ${(props) =>
-    props.isDarkMode
-      ? "#ffffff"
-      : "#01490b"}; 
+  color: ${(props) => (props.isDarkMode ? "#ffffff" : "#01490b")};
   text-decoration: none;
   font-weight: 500;
   padding: 0.5rem 1.5rem;
@@ -67,7 +64,7 @@ const FavoritesPage = ({ isDarkMode }) => {
   }, []);
 
   return (
-    <div className="flex flex-col mb-10 justify-center items-center mx-auto h-full">
+    <div className="flex flex-col mb-10 justify-center items-center mx-auto  h-screen">
       <p className="pt-5 px-3 w-full max-w-xl text-lg font-main font-bold text-center">
         Your Favorite Recipes
       </p>
